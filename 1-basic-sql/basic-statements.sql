@@ -79,3 +79,24 @@ WHERE name = 'Exxon Mobil';
 SELECT name, website, primary_poc
 FROM accounts
 WHERE name != 'Exxon Mobil';
+
+/* 5) Creating a new column that is a combination of existing columns is known as a derived column (or "calculated" or "computed" column). Usually you want to give a name, or "alias," to your new column using the AS keyword. */
+
+SELECT id, (standard_amt_usd/total_amt_usd)*100 AS std_percent, total_amt_usd
+FROM orders
+LIMIT 10;
+
+/* Remember PEMDAS from math class to help remember the order of operations? If not, check out this link as a reminder. The same order of operations applies when using arithmetic operators in SQL.
+
+The following two statements have very different end results:
+
+Standard_qty / standard_qty + gloss_qty + poster_qty
+standard_qty / (standard_qty + gloss_qty + poster_qty) */
+
+SELECT id, account_id, (standard_amt_usd/standard_qty) AS unit_price
+FROM orders
+LIMIT 10;
+
+SELECT id, account_id, (poster_amt_usd/total_amt_usd)*100 AS poster_percentage
+FROM orders
+LIMIT 10;
