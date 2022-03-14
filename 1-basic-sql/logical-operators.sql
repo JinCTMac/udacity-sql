@@ -33,3 +33,42 @@ WHERE name IN ('Walmart', 'Target', 'Nordstrom');
 SELECT *
 FROM web_events
 WHERE channel IN ('organic', 'adwords');
+
+/* 3) NOT clause */
+/* The NOT operator is an extremely useful operator for working with the previous two operators we introduced: IN and LIKE. By specifying NOT LIKE or NOT IN, we can grab all of the rows that do not meet a particular criteria. */
+
+/* so for example, using NOT LIKE with %google% wildcards us see all sites that don't have google in them */
+
+SELECT name, primary_poc, sales_rep_id
+FROM accounts
+WHERE name NOT IN ('Walmart', 'Target', 'Nordstrom');
+
+/* select companies where name doesn't begin with C */
+
+SELECT *
+FROM accounts
+WHERE name NOT LIKE 'C%';
+
+SELECT *
+FROM accounts
+WHERE name NOT LIKE '%one%';
+
+/* 4) AND clause */
+/* The AND operator is used within a WHERE statement to consider more than one logical clause at a time. Each time you link a new statement with an AND, you will need to specify the column you are interested in looking at. You may link as many statements as you would like to consider at the same time. This operator works with all of the operations we have seen so far including arithmetic operators (+, *, -, /). LIKE, IN, and NOT logic can also be linked together using the AND operator. */
+
+SELECT *
+FROM orders
+WHERE standard_qty > 1000 AND poster_qty = 0 AND gloss_qty = 0;
+
+/* selects if name doesn't begin with C and doesn't end with s */
+
+SELECT *
+FROM accounts
+WHERE name NOT LIKE 'C%' AND name NOT LIKE '%s';
+
+/* 5) BETWEEN clause */
+/* Sometimes we can make a cleaner statement using BETWEEN than we can using AND. Particularly this is true when we are using the same column for different parts of our AND statement. In the previous video, we probably should have used BETWEEN, as it is especially useful for dates. */
+
+SELECT *
+FROM orders
+WHERE date BETWEEN '2022-03-12' AND '2022-03-14';
