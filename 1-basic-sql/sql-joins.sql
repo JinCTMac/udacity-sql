@@ -91,3 +91,11 @@ JOIN sales_reps s
 ON a.sales_rep_id = s.id
 JOIN region r
 ON s.region_id = r.id;
+
+/* inner joins only pulls rows from tables where there is a match in both tables, so if you want to see a row which has no values in the second table, you need to use a left join */
+
+/* 2) LEFT and RIGHT joins */
+
+/* left and right joins allow us to pull up rows that might only exist in one table or the other, where they will be joined but the respective value from the other table where the row isn't present will return NULL */
+
+/* A full outer join will join all rows from either table, returning NULL where there isn't a matching value in either table */
