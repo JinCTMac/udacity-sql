@@ -53,3 +53,41 @@ JOIN accounts
 ON web_events.account_id = accounts.id
 JOIN orders
 ON accounts.id = orders.account_id
+
+/* you can make joining tables much easier with aliases, and you actually don't need to use the AS clause to do this */
+
+FROM tablename t1
+JOIN tablename2 t2
+
+Select t1.column1 aliasname, t2.column2 aliasname2
+FROM tablename AS t1
+JOIN tablename2 AS t2
+
+/* query selecting web names associated with account name Walmart */
+
+SELECT we.occurred_at, acc.primary_poc, we.channel, acc.name
+FROM web_events we
+JOIN accounts acc
+ON we.account_id = acc.id
+WHERE acc.name = 'Walmart';
+
+/* selecting region, accoutn name and sales rep */
+
+SELECT r.name region, a.name account, s.name rep
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+JOIN accounts a
+ON a.sales_rep_id = s.id
+ORDER BY a.name;
+
+/* complex query with multiple joins and calculations */
+
+SELECT r.name region, a.name account, (o.total_amt_usd/(o.total + 0.01)) unit_price
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id;
