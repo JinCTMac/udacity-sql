@@ -99,3 +99,31 @@ ON s.region_id = r.id;
 /* left and right joins allow us to pull up rows that might only exist in one table or the other, where they will be joined but the respective value from the other table where the row isn't present will return NULL */
 
 /* A full outer join will join all rows from either table, returning NULL where there isn't a matching value in either table */
+
+SELECT r.name region, s.name rep, a.name account
+FROM accounts a
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id
+WHERE r.name = 'Midwest';
+
+SELECT r.name region, s.name rep, a.name account
+FROM accounts a
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id
+WHERE r.name = 'Midwest'
+AND s.name LIKE 'S%';
+
+/* query to select people with last name beginning with capital K, smart trick to put space in front of K to know it must be a last name */
+
+SELECT r.name region, s.name rep, a.name account
+FROM accounts a
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id
+WHERE r.name = 'Midwest'
+AND s.name LIKE '% K%';
