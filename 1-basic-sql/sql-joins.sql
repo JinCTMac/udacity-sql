@@ -44,3 +44,12 @@ ON accounts.id = orders.account_id;
 /* 2) Primary keys (PK) and Foreign keys (FK) */
 
 /* Primary Keys exist in every table, and are unique values, normally an ID, that is made unique via auto-increment. Foreign keys are columns in tables that refer to the primary keys of another table. They usually are defined with the name of the table they reference with _id, like region_id. */
+
+/* if you wanted to join 3 tables or more, you can */
+
+SELECT *
+FROM web_events
+JOIN accounts
+ON web_events.account_id = accounts.id
+JOIN orders
+ON accounts.id = orders.account_id
