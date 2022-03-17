@@ -139,3 +139,33 @@ ON a.sales_rep_id = s.id
 JOIN region r
 ON s.region_id = r.id
 WHERE o.standard_qty > 100;
+
+/* same but with poster_qty > 50 and ordering by unit+price */
+
+SELECT r.name region, a.name account_name, (o.total_amt_usd/(o.total+0.01)) unit_price
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id
+WHERE o.standard_qty > 100
+AND o.poster_qty > 50
+ORDER BY unit_price;
+
+/* select all for account ID 1001 */
+
+SELECT w.channel, a.name
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+WHERE w.account_id = 1001;
+
+/* using select distinct to only access unique values */
+
+SELECT DISTINCT w.channel, a.name
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+WHERE w.account_id = 1001;
