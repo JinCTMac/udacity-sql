@@ -169,3 +169,12 @@ FROM web_events w
 JOIN accounts a
 ON w.account_id = a.id
 WHERE w.account_id = 1001;
+
+/* finding all orders that happened in 2015 */
+
+SELECT o.occurred_at order_date, a.name account, o.total total_qty, o.total_amt_usd total_price
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+WHERE o.occurred_at BETWEEN '2015-01-01' AND '2015-12-31'
+ORDER BY o.occurred_at;
