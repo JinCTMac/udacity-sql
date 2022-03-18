@@ -70,3 +70,40 @@ FROM orders;
 
 SELECT (SUM(poster_qty)/COUNT(*)) as other_avg
 FROM orders;
+
+/* to find the earliest date of an order you can use MIN function on a date column */
+
+SELECT MIN(occurred_at)
+FROM orders;
+
+/* otherwise, you'd need to do an ORDER BY statement to sort for earliest date */
+
+SELECT occurred_at
+FROM orders
+ORDER BY occurred_at;
+
+/* finding the most recent date using MAX function */
+
+SELECT MAX(occurred_at)
+FROM web_events;
+
+/* same logic for finding it without an aggregation function, you need to run order by */
+
+SELECT occurred_at
+FROM web_events
+ORDER BY occurred_at DESC;
+
+/* finding averages for spending and qty ordered */
+
+SELECT AVG(standard_qty) avg_standard_qty, AVG(gloss_qty) avg_gloss_qty, AVG(poster_qty) avg_poster_qty, AVG(standard_amt_usd) avg_standard_usd, AVG(gloss_amt_usd) avg_gloss_usd, AVG(poster_amt_usd) avg_poster_usd
+FROM orders;
+
+/* to find medium spending, you can use a subquery */
+
+SELECT *
+FROM (SELECT total_amt_usd
+      FROM orders
+      ORDER BY total_amt_usd
+      LIMIT 3457) AS Table1
+ORDER BY total_amt_usd DESC
+LIMIT 2;
