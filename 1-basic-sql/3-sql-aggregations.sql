@@ -28,7 +28,30 @@ FROM orders;
 SELECT COUNT(*) AS order_rows_count
 FROM orders;
 
-/* you can also count a specific column */
+/* you can also count a specific column, and check if the number of rows there is the same as for the whole table, if not there is NULL data in that column */
 
 SELECT COUNT(accounts.id)
 FROM accounts;
+
+/* 3) SUM function */
+
+/* we can use the SUM function to count numerical data, and unlike COUNT, the presence of NULL values isn't as much of an issue as it will treat any NULL it finds in a column as 0 - it could be useful to compare several rows to each other and see how they stack up */
+
+SELECT SUM(poster_qty) AS total_poster_qty
+FROM orders;
+
+SELECT SUM(standard_qty) AS total_standard_qty
+FROM orders;
+
+/* to check total amount spent */
+
+SELECT SUM(total_amt_usd) AS total_order_amt_usd
+FROM orders;
+
+SELECT SUM(standard_amt_usd) total_standard_amt, SUM(gloss_amt_usd) total_gloss_amt
+FROM orders;
+
+/* find average price/cost per unit of paper sold */
+
+SELECT SUM(standard_amt_usd)/SUM(standard_qty) AS standard_price_per_unit
+FROM orders;
