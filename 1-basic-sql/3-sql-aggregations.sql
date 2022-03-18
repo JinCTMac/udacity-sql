@@ -55,3 +55,18 @@ FROM orders;
 
 SELECT SUM(standard_amt_usd)/SUM(standard_qty) AS standard_price_per_unit
 FROM orders;
+
+/* 4) MIN and MAX functions */
+
+SELECT MIN(poster_qty), MAX(poster_qty)
+FROM orders;
+
+/* 5) AVG function */
+
+SELECT AVG(poster_qty)
+FROM orders;
+
+/* note, AVG ignores NULLS completely, so if we want to treat the NULLs as being equal to 0, we need to take the sum of what we want and then divide by the COUNT of the rows to get an average that way */
+
+SELECT (SUM(poster_qty)/COUNT(*)) as other_avg
+FROM orders;
