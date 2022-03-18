@@ -15,3 +15,20 @@ WHERE primary_poc IS NULL;
 SELECT *
 from orders
 WHERE primary_poc IS NOT NULL;
+
+/* 2) COUNT function */
+
+/* used to count all rows where there is non-null data - it is very rare to find a row where all the data is NULL, so this will typically return all of the rows within a table */
+
+SELECT COUNT(*)
+FROM orders;
+
+/* we can alias the count to make it easier to understand */
+
+SELECT COUNT(*) AS order_rows_count
+FROM orders;
+
+/* you can also count a specific column */
+
+SELECT COUNT(accounts.id)
+FROM accounts;
