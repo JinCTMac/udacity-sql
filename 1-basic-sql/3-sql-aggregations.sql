@@ -308,3 +308,44 @@ ON w.account_id = a.id
 GROUP BY a.name, w.channel
 HAVING COUNT(w.channel) > 6
 ORDER BY channel_amt DESC;
+
+/* 9) DATE_TRUNC and DATE_PART */
+
+/* DATE_TRUNC is used to round off timestamps, so you can aggregate events that occur within a day into the same date */
+
+/* DATEPART is used to return the part of the date that has been specified, so you can run DATEPART(year, '2019-12-01') and it will return 2019 */
+
+/* finding out sales per year */
+
+SELECT DATE_PART('year', o.occurred_at) sale_year, SUM(o.total_amt_usd) sales
+FROM orders o
+GROUP BY sale_year
+ORDER BY sales;
+
+/* finding out sales per month */
+
+SELECT DATE_TRUNC('month', o.occurred_at) sale_month, SUM(o.total_amt_usd) sales
+FROM orders o
+GROUP BY sale_month
+ORDER BY sale_month DESC;
+
+/* highest sales per year - years not represented well because 2017 only has 1 month of data */
+
+SELECT DATE_TRUNC('year', o.occurred_at) sale_year, SUM(o.total_amt_usd) sales
+FROM orders o
+GROUP BY sale_year
+ORDER BY sales DESC;
+
+/* highest sales per month - again not representative because 2017 only has one month of sales data */
+
+SELECT DATE_PART('month', o.occurred_at) sale_month, SUM(o.total_amt_usd) sales
+FROM orders o
+GROUP BY sale_month
+ORDER BY sales DESC;
+
+/* highest sales for month year for Walmart */
+
+SELECT DATE_TRUNC('month', o.occurred_at) sale_month, SUM(o.gloss_amt_usd) gloss_sales
+FROM orders o
+GROUP BY sale_month
+ORDER BY gloss_sales DESC;
