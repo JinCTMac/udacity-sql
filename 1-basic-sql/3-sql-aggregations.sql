@@ -107,3 +107,14 @@ FROM (SELECT total_amt_usd
       LIMIT 3457) AS Table1
 ORDER BY total_amt_usd DESC
 LIMIT 2;
+
+/* 6) GROUP BY statement */
+
+/* GROUP BY is used to split aggregates like a SUM function calculation and group them into segments, such as by account_id or something else, which allows us to effectively see the aggregate data associated with the segments of the data we want */
+
+/* in the example, they aggregate paper quantity sold across the whole dataset, which returns one row, but if we want to see the sum of paper quantities sold by each account, we need to use the GROUP BY function to segment this aggregate into each of the accounts and the quanities sold associated with them */
+
+SELECT account_id, SUM(standard_qty) total_standard_qty, SUM(gloss_qty) total_gloss_qty, SUM(poster_qty) total_poster_qty
+FROM orders
+GROUP BY account_id
+ORDER BY account_id;
