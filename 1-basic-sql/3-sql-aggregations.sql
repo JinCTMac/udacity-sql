@@ -204,7 +204,7 @@ GROUP BY a.name;
 
 /* q3) count the number of times each channel was used for each sales rep, using GROUP BY with two parameters */
 
-SELECT s.name sales_rep, w.channel channel, COUNT(w.channel) channel_amt
+SELECT s.name sales_rep, w.channel channel, COUNT(*) channel_amt
 FROM web_events w
 JOIN accounts a
 ON w.account_id = a.id
@@ -225,3 +225,33 @@ JOIN region r
 ON s.region_id = r.id
 GROUP BY r.name, w.channel
 ORDER BY r.name, w.channel;
+
+/* 7) DISTINCT statement */
+
+/* DISTINCT is used to return only distinct (different) values */
+
+/* check if accounts are associated with more than one region */
+
+SELECT DISTINCT a.name account, r.name
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id;
+
+/* check if any sales reps have worked on more than one account */
+
+SELECT DISTINCT s.name sales_rep, a.name account
+FROM accounts a
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+ORDER BY s.name;
+
+/* VS */
+
+SELECT DISTINCT id, name
+FROM sales_reps;
+
+/* tells us that there are only 50 sales reps, and may more accounts so each sales rep has worked on at least 2 accounts or more */
