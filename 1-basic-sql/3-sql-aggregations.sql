@@ -249,9 +249,62 @@ JOIN sales_reps s
 ON a.sales_rep_id = s.id
 ORDER BY s.name;
 
-/* VS */
+/* tells us that there are only 50 sales reps, and may more accounts so each sales rep has worked on at least 2 accounts or more */
 
 SELECT DISTINCT id, name
 FROM sales_reps;
 
-/* tells us that there are only 50 sales reps, and may more accounts so each sales rep has worked on at least 2 accounts or more */
+/* 8) HAVING clause */
+
+/* HAVING is used to replace the WHERE clause when we are testing for a logical condition on aggregated data */
+
+/* finding out which sales reps manage more than 5 accounts */
+
+SELECT s.name sales_rep, COUNT(a.id) account_amt
+FROM accounts a
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+GROUP BY s.name
+HAVING COUNT(a.id) > 5
+ORDER BY account_amt DESC;
+
+/* finding out which accounts have more than 20 orders */
+
+SELECT a.name account, COUNT(o.id) order_amt
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+HAVING COUNT(o.id) > 20
+ORDER BY order_amt DESC;
+
+/* finding out which accounts have spent over $30,000 in orders */
+
+SELECT a.name account, SUM(o.total_amt_usd) order_amt
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+HAVING SUM(o.total_amt_usd) > 30000
+ORDER BY order_amt DESC;
+
+/* which accounts used facebook as the channel more than 6 times */
+
+SELECT a.name account, w.channel, COUNT(w.channel) channel_amt
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+WHERE w.channel LIKE 'facebook'
+GROUP BY a.name, w.channel
+HAVING COUNT(w.channel) > 6
+ORDER BY channel_amt DESC;
+
+/* most frequent channels */
+
+SELECT a.name account, w.channel, COUNT(w.channel) channel_amt
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+GROUP BY a.name, w.channel
+HAVING COUNT(w.channel) > 6
+ORDER BY channel_amt DESC;
