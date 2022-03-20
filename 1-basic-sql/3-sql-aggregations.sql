@@ -183,3 +183,45 @@ FROM sales_reps s
 JOIN region r
 ON s.region_id = r.id
 GROUP BY r.name;
+
+/* GROUP BY II - you can make your grouping/segmenting more granular by using two or more columns in the GROUP BY */
+
+/* q1) find out average qty of each paper type each account ordered */
+
+SELECT a.name account, AVG(o.standard_qty) avg_standard, AVG(o.gloss_qty) avg_gloss, AVG(o.poster_qty) avg_poster
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name;
+
+/* q2) average amount spent on each paper type for each account */
+
+SELECT a.name account, AVG(o.standard_amt_usd) avg_standard_amt, AVG(o.gloss_amt_usd) avg_gloss_amt, AVG(o.poster_amt_usd) avg_poster_amt
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name;
+
+/* q3) count the number of times each channel was used for each sales rep, using GROUP BY with two parameters */
+
+SELECT s.name sales_rep, w.channel channel, COUNT(w.channel) channel_amt
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+GROUP BY s.name, w.channel
+ORDER BY s.name, w.channel;
+
+/* q4) count number of times each channel was used for each region */
+
+SELECT r.name region, w.channel channel, COUNT(w.channel) channel_amt
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+JOIN region r
+ON s.region_id = r.id
+GROUP BY r.name, w.channel
+ORDER BY r.name, w.channel;
