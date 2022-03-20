@@ -118,3 +118,68 @@ SELECT account_id, SUM(standard_qty) total_standard_qty, SUM(gloss_qty) total_gl
 FROM orders
 GROUP BY account_id
 ORDER BY account_id;
+
+/* example qs to test which aggregation function or statements are most useful for each situation */
+
+/* q1) find which account placed earliest order */
+
+SELECT a.name account_name, o.occurred_at order_date
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+ORDER BY o.occurred_at
+LIMIT 1;
+
+/* q2) finding total sales for each account */
+
+SELECT a.name company_name, SUM(o.total_amt_usd) total_sales
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name;
+
+/* q3) finding latest web event and channel associated with it */
+
+SELECT a.name account, w.occurred_at date, w.channel channel
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+ORDER BY w.occurred_at DESC;
+
+/* q4) finding out how many times each channel type was used */
+
+SELECT w.channel channel, COUNT(w.channel) usage_amt
+FROM web_events w
+GROUP BY w.channel;
+
+/* q5) finding primary poc of earliest web event */
+
+SELECT a.primary_poc poc, w.occurred_at date
+FROM web_events w
+JOIN accounts a
+ON w.account_id = a.id
+ORDER BY w.occurred_at DESC;
+
+/* q6) finding smallest amount spent for each account */
+
+SELECT a.name account, MIN(o.total_amt_usd) smallest_amt
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name;
+
+/* q7) finding number of sales reps per region */
+
+SELECT r.name region, COUNT(s.region_id) sales_reps_amt
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+GROUP BY r.name;
+
+/* below is better since two tables are joined and can just count all the rows instead and sort by region */
+
+SELECT r.name region, COUNT(*) sales_reps_amt
+FROM sales_reps s
+JOIN region r
+ON s.region_id = r.id
+GROUP BY r.name;
