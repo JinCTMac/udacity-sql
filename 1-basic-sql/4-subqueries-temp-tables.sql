@@ -111,3 +111,68 @@ HAVING SUM(o.total) >
   ORDER BY MAX(o.standard_qty) DESC
   LIMIT 1)
 ORDER BY total_orders DESC;
+
+/* 3) WITH clause */
+
+/* you can use the WITH clause to write subqueries as their own table, which you can then query instead of having to run the subquery each time - this makes performance much easier */
+
+/* below is the same question as before where we were finding the average events for each channel per day */
+
+WITH events AS (
+          SELECT DATE_TRUNC('day',occurred_at) AS day,
+                        channel, COUNT(*) as events
+          FROM web_events
+          GROUP BY 1,2)
+
+SELECT channel, AVG(events) AS average_events
+FROM events
+GROUP BY channel
+ORDER BY 2 DESC;
+
+/* you can also create more than 1 table, and subsequent tables don't need the WITH keyword */
+
+WITH table1 AS (
+          SELECT *
+          FROM web_events),
+
+     table2 AS (
+          SELECT *
+          FROM accounts)
+
+
+SELECT *
+FROM table1
+JOIN table2
+ON table1.account_id = table2.id;
+
+/* rewriting a question from earlier about standard paper qty using with */
+
+WITH standard_max AS (SELECT MAX(o.standard_qty) standard_amt
+  FROM orders o
+  JOIN accounts a
+  ON o.account_id = a.id
+  GROUP BY a.name
+  ORDER BY MAX(o.standard_qty) DESC
+  LIMIT 1)
+
+SELECT a.name account, SUM(o.total) total_orders
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+HAVING SUM(o.total) > standard_max
+ORDER BY total_orders DESC;
+
+/* lifetime spending for top 10 spending accounts */
+
+WITH t1 AS (
+  SELECT a.id, a.name, SUM(o.total_amt_usd) tot_spent
+  FROM orders o
+  JOIN accounts a
+  ON a.id = o.account_id
+  GROUP BY a.id, a.name
+  ORDER BY 3 DESC
+  LIMIT 10)
+
+SELECT AVG(tot_spent)
+FROM t1;
