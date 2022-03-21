@@ -349,3 +349,24 @@ SELECT DATE_TRUNC('month', o.occurred_at) sale_month, SUM(o.gloss_amt_usd) gloss
 FROM orders o
 GROUP BY sale_month
 ORDER BY gloss_sales DESC;
+
+/* 10) CASE statements */
+
+/* The CASE statement is pretty similar to case statements in Ruby and switch statements in JS, it represents IF ELSE logic in SQL and allows you to filter by specific conditions more easily than WHERE and AND/OR if there are multiple conditions you need to filter by */
+
+SELECT account_id, occurred_at, total
+CASE WHEN total > 500 THEN 'Over 500',
+WHEN total > 300 AND total <= 500 THEN '301-500',
+WHEN total > 100 AND total <= 300 THEN '101-300',
+ELSE '100 or under'
+END AS total_group
+FROM orders;
+
+/* CASE statements use CASE, WHEN, THEN, ELSE and END keywords, including often an END AS to define a new separate column for the results of the conditional statement to be placed into */
+
+SELECT account_id, CASE WHEN standard_qty = 0 OR standard_qty IS NULL THEN 0
+                        ELSE standard_amt_usd/standard_qty END AS unit_price
+FROM orders
+LIMIT 10;
+
+/* previously we encountered an issue where we wanted to work out the unit price for each standard_paper unit sold by dividing total cost by total units sold - this wouldn't work if the division was by 0 i.e. there was an order of 0 units of standard paper, so to work around this we can use a CASE statement like above */
