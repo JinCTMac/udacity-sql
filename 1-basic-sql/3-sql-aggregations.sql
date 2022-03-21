@@ -355,9 +355,9 @@ ORDER BY gloss_sales DESC;
 /* The CASE statement is pretty similar to case statements in Ruby and switch statements in JS, it represents IF ELSE logic in SQL and allows you to filter by specific conditions more easily than WHERE and AND/OR if there are multiple conditions you need to filter by */
 
 SELECT account_id, occurred_at, total
-CASE WHEN total > 500 THEN 'Over 500',
-WHEN total > 300 AND total <= 500 THEN '301-500',
-WHEN total > 100 AND total <= 300 THEN '101-300',
+CASE WHEN total > 500 THEN 'Over 500'
+WHEN total > 300 AND total <= 500 THEN '301-500'
+WHEN total > 100 AND total <= 300 THEN '101-300'
 ELSE '100 or under'
 END AS total_group
 FROM orders;
@@ -370,3 +370,80 @@ FROM orders
 LIMIT 10;
 
 /* previously we encountered an issue where we wanted to work out the unit price for each standard_paper unit sold by dividing total cost by total units sold - this wouldn't work if the division was by 0 i.e. there was an order of 0 units of standard paper, so to work around this we can use a CASE statement like above */
+
+/* We can also use CASE statements with aggregations, in order to group aggregate data into new groups separated out by the CASE statement */
+
+/* filtering order sizes by spend */
+
+SELECT account_id, total_amt_usd,
+CASE WHEN total_amt_usd >= 3000 THEN 'Large'
+WHEN total_amt_usd < 3000 THEN 'Small'
+END AS order_size
+FROM orders
+ORDER BY total_amt_usd DESC;
+
+/* filtering orders by order volume */
+
+SELECT account_id, total,
+CASE WHEN total >= 2000 THEN 'Over 2000'
+WHEN total >= 1000 AND total < 2000 THEN 'Between 1000 - 2000'
+WHEN total < 1000 THEN 'Less than 1000'
+END AS order_size
+FROM orders
+ORDER BY total DESC;
+
+/* filter accounts by total amount spent lifetime, using SUM and GROUP BY to sort by accounts */
+
+SELECT a.name account, SUM(o.total_amt_usd) total_amt,
+CASE WHEN SUM(o.total_amt_usd) > 200000 THEN 'greater than 200,000'
+WHEN SUM(o.total_amt_usd) >= 100000 AND SUM(o.total_amt_usd) < 200000 THEN '100,000 - 200,000'
+WHEN SUM(o.total_amt_usd) < 100000 THEN 'less than 100,000'
+END AS lifetime_value
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC;
+
+/* filtering same as above, but only including orders from 2016 onwards */
+
+SELECT a.name account, SUM(o.total_amt_usd) total_amt,
+CASE WHEN SUM(o.total_amt_usd) > 200000 THEN 'greater than 200,000'
+WHEN SUM(o.total_amt_usd) >= 100000 AND SUM(o.total_amt_usd) < 200000 THEN '100,000 - 200,000'
+WHEN SUM(o.total_amt_usd) < 100000 THEN 'less than 100,000'
+END AS lifetime_value
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+WHERE o.occurred_at > '2015-12-31'
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC;
+
+/* filtering by sales rep orders performance - each order, not amount ordered*/
+
+SELECT s.name sales_rep, COUNT(o.*) total_orders,
+CASE WHEN COUNT(o.*) > 200 THEN 'top'
+WHEN COUNT(o.*) <= 200 THEN 'not'
+END AS top_performing
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+GROUP BY s.name
+ORDER BY COUNT(o.*) DESC;
+
+/* advanced filter by sales rep performance based on 1) order amount and 2) sales amount */
+
+SELECT s.name sales_rep, COUNT(o.*) order_total, SUM(o.total_amt_usd) sales_total,
+CASE WHEN COUNT(o.*) > 200 OR SUM(o.total_amt_usd) > 750000 THEN 'top'
+WHEN (COUNT(o.*) >= 150 AND COUNT(o.*) < 200) OR (SUM(o.total_amt_usd) >= 500000 AND SUM(o.total_amt_usd) < 750000) THEN 'middle'
+WHEN COUNT(o.*) < 150 OR SUM(o.total_amt_usd) < 500000 THEN 'low'
+END AS performance_level
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+GROUP BY s.name
+ORDER BY SUM(o.total_amt_usd) DESC;
