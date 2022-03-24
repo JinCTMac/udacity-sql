@@ -176,3 +176,37 @@ WITH t1 AS (
 
 SELECT AVG(tot_spent)
 FROM t1;
+
+/* q4) for customer with highest lifetime spending, how many web events did they have per channel?
+
+/* a) find out customer with highest lifetime spending */
+
+SELECT a.name account, SUM(o.total_amt_usd) total_spent
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC;
+
+/* b) link that to web events, building table t2 to find out number of web events per account per channel */
+
+WITH t1 AS (SELECT a.name account, SUM(o.total_amt_usd) total_spent
+  FROM orders o
+  JOIN accounts a
+  ON o.account_id = a.id
+  GROUP BY a.name
+  ORDER BY SUM(o.total_amt_usd) DESC
+  LIMIT 1),
+
+  t2 AS (SELECT a.name account, w.channel channel, COUNT(w.channel) amt
+  FROM web_events w
+  JOIN accounts a
+  ON w.account_id = a.id
+  GROUP BY a.name, w.channel
+  ORDER BY a.name)
+
+SELECT t2.account, t2.channel, t2.amt
+FROM t2
+JOIN t1
+ON t2.account = t1.account
+WHERE t2.account = t1.account;
