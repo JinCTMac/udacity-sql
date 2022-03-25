@@ -76,3 +76,28 @@ FROM accounts)
 SELECT COUNT(*)
 FROM t1
 WHERE start_char = 'vowel';
+
+/* 2) POSITION, STRPOS, LOWER, UPPER and SUBSTRING */
+
+/* sometimes, you want to know which position in a string a certain character is for you to use LEFT/RIGHT more easily - POSITION and STRPOS will do this for you, by returning a value showing the position of the character that you specify */
+
+/* LOWER and UPPER will convert a whole string into lower or uppercase to allow you to not worry about case in the string you are examining */
+
+/* for example, below we use POSITION to isolate the comma in the city address, then since we just want the information before the comma, we subtract 1 from that in the lEFT function to return just the city */
+
+SELECT LEFT(city_state, POSITION(',' IN city_state) - 1) AS city
+FROM data;
+
+/* q1) finding first and last names - for first name it is position - 1 in 2nd param, for last name you have to do length - position as position gives you the position in the string from the left, and for the right you have take it away from the length to get the right result */
+
+SELECT name, primary_poc,
+LEFT(primary_poc, POSITION(' ' IN primary_poc) - 1) AS first_name,
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) AS last_name
+FROM accounts;
+
+/* q2) same but for sales reps names */
+
+SELECT name,
+LEFT(name, POSITION(' ' IN name) - 1) AS first_name,
+RIGHT(name, LENGTH(name) - POSITION(' ' IN name)) AS last_name
+FROM sales_reps;
