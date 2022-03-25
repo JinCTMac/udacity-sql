@@ -42,3 +42,37 @@ CASE WHEN LEFT(name, 1) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') TH
 ELSE 'letter'
 END AS first_char
 FROM accounts;
+
+/* q31) total number of companies starting with letter is 350, and there are 351 records so 350/351 */
+
+WITH t1 AS (SELECT name,
+CASE WHEN LEFT(name, 1) IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9') THEN 'number'
+ELSE 'letter'
+END AS first_char
+FROM accounts)
+
+SELECT COUNT(*)
+FROM t1
+WHERE first_char = 'letter';
+
+/* q4) which proportion of companies start with a vowel and what % is anything else */
+
+/* q4a) find out which companies start with vowel and label */
+
+SELECT name,
+CASE WHEN LEFT(name, 1) IN ('A', 'E', 'I', 'O', 'U') THEN 'vowel'
+ELSE 'not_vowel'
+END AS start_char
+FROM accounts;
+
+/* q4b) then count number of companies with vowels in starting char and divide by total - total is 79 so 79/351 for vowels % */
+
+WITH t1 AS (SELECT name,
+CASE WHEN LEFT(name, 1) IN ('A', 'E', 'I', 'O', 'U') THEN 'vowel'
+ELSE 'not_vowel'
+END AS start_char
+FROM accounts)
+
+SELECT COUNT(*)
+FROM t1
+WHERE start_char = 'vowel';
