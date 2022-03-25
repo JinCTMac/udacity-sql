@@ -210,3 +210,78 @@ FROM t2
 JOIN t1
 ON t2.account = t1.account
 WHERE t2.account = t1.account;
+
+/* q5) what is the lifetime average amount spent in terms of total_amt_usd for the top 10 spending accounts? */
+
+/* a) find the top 10 spending accounts */
+
+SELECT a.name account, SUM(o.total_amt_usd) spending
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC;
+
+/* b) find their average lifetime spending per order */
+
+SELECT a.name account, AVG(o.total_amt_usd) avg_spending
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+ORDER BY SUM(o.total_amt_usd) DESC;
+
+/* c) join if you want to see the data side by side */
+
+WITH t1 AS (SELECT a.name account, SUM(o.total_amt_usd) spending
+  FROM orders o
+  JOIN accounts a
+  ON o.account_id = a.id
+  GROUP BY a.name
+  ORDER BY SUM(o.total_amt_usd) DESC),
+
+t2 AS (SELECT a.name account, AVG(o.total_amt_usd) avg_spending
+  FROM orders o
+  JOIN accounts a
+  ON o.account_id = a.id
+  GROUP BY a.name
+  ORDER BY SUM(o.total_amt_usd) DESC)
+
+SELECT t1.account, t1.spending, t2.avg_spending
+FROM t1
+JOIN t2
+ON t1.account = t2.account
+ORDER BY t1.spending DESC
+LIMIT 10;
+
+/* q6) what is the lifetime average amount spent for companies that spent more than the average of all orders */
+
+/* a) find what the average order spend is like */
+
+SELECT AVG(total_amt_usd)
+FROM orders;
+
+/* b) find out which companies have average lifetime order spend higher than this value */
+
+/* b1) insert the above int a subquery to return only avg spend of companies with higher spend than the avg amount */
+
+SELECT a.name account, AVG(o.total_amt_usd) avg_spend
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+HAVING AVG(o.total_amt_usd) > (SELECT AVG(total_amt_usd) FROM orders)
+ORDER BY AVG(o.total_amt_usd) DESC;
+
+/* b2) then calculate the average for this whole table */
+
+WITH t1 AS (SELECT a.name account, AVG(o.total_amt_usd) avg_spend
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+GROUP BY a.name
+HAVING AVG(o.total_amt_usd) > (SELECT AVG(total_amt_usd) FROM orders)
+ORDER BY AVG(o.total_amt_usd) DESC)
+
+SELECT AVG(avg_spend)
+FROM t1;
