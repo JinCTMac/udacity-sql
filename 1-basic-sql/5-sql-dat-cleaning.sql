@@ -103,3 +103,55 @@ RIGHT(name, LENGTH(name) - POSITION(' ' IN name)) AS last_name
 FROM sales_reps;
 
 /* 3) CONCAT and || for merging strings */
+
+/* you can use the CONCAT function to merge columns, with separating values like spaces and commas being coded into the function as a paramter, or use pipes || to separate values you want to concatenate */
+
+SELECT first_name,
+last_name,
+CONCAT(first_name, ' ', last_name) AS full_name,
+first_name || ' ' || last_name AS full_name_alt
+FROM address_book;
+
+/* q1) create an email address column with format first_name.last_name@company_name.com */
+
+/* q1a) first split the primary_poc into first and last names */
+
+SELECT name, primary_poc,
+LEFT(primary_poc, POSITION(' ' IN primary_poc)-1) AS first_name,
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) AS last_name
+FROM accounts;
+
+/* q1b) then concat as appropriate, lowercase company name */
+
+WITH t1 AS (SELECT name, primary_poc,
+LEFT(primary_poc, POSITION(' ' IN primary_poc)-1) AS first_name,
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) AS last_name
+FROM accounts)
+
+SELECT t1.name, t1.primary_poc,
+CONCAT(t1.first_name, '.', t1.last_name, '@', LOWER(name), '.com') AS email
+FROM t1;
+
+/* q2) do the same as above, but remove spaces from the company names */
+
+/* done using the REPLACE function, which takes a column param, a set of characters to replace, and what to replace it with so REPLACE(variable, ' ', '') for example, below works as SQL evaluates inner brackets first so replacing the spaces before executing outer function */
+
+WITH t1 AS (SELECT name, primary_poc,
+LEFT(primary_poc, POSITION(' ' IN primary_poc)-1) AS first_name,
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) AS last_name
+FROM accounts)
+
+SELECT t1.name, t1.primary_poc,
+CONCAT(t1.first_name, '.', t1.last_name, '@', LOWER(REPLACE(name, ' ', '')), '.com') AS email
+FROM t1;
+
+/* q3) create a password through concat */
+
+WITH t1 AS (SELECT name, primary_poc,
+LEFT(primary_poc, POSITION(' ' IN primary_poc)-1) AS first_name,
+RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) AS last_name
+FROM accounts)
+
+SELECT t1.name, t1.primary_poc,
+CONCAT(LEFT(t1.first_name, 1), RIGHT(t1.last_name, 1), LEFT(t1.last_name, 1), RIGHT(t1.last_name, 1), LENGTH(t1.first_name), LENGTH(t1.last_name), t1.name) AS password
+FROM t1;
