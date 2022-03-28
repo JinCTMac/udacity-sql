@@ -8,6 +8,8 @@
 
 /* RIGHT does the same but from the right side of the string - note they make whole new columns by doing this */
 
+/* SUBSTR extracts a substring from a string, given 3 parameters; the string, the position to start with and the number of characters to extract, going left to right i.e. SUBSTR('customers', 1, 3) returns cus */
+
 SELECT phone_number, LEFT(phone_number, 3) AS area_code
 FROM address_book;
 
@@ -165,3 +167,5 @@ CAST(CONCAT(year, '-', month, '-', day)) AS new_date
 FROM datebook;
 
 /* task to convert a non-conventional date format into a SQL-readable date format of yyyy-mm-dd */
+
+/* to do this, we need the
