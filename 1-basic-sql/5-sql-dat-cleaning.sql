@@ -168,4 +168,27 @@ FROM datebook;
 
 /* task to convert a non-conventional date format into a SQL-readable date format of yyyy-mm-dd */
 
-/* to do this, we need the
+SELECT *
+FROM sf_crime_data
+LIMIT 10;
+
+/* to do this, we need the SUBSTR function alongside CONCAT and CAST */
+
+SELECT date,
+SUBSTR(date, 1, 10) AS new_date
+FROM sf_crime_data
+LIMIT 10;
+
+/* now to convert that substring into the right format - my solution below, exemplar solution after that */
+
+WITH t1 AS (SELECT date,
+SUBSTR(date, 1, 10) AS new_date
+FROM sf_crime_data)
+
+SELECT t1.new_date,
+CONCAT(RIGHT(t1.new_date, 4), '-', LEFT(t1.new_date, 2), '-', SUBSTR(t1.new_date, 4, 2))::date AS final_date
+FROM t1
+LIMIT 10;
+
+SELECT date orig_date, (SUBSTR(date, 7, 4) || '-' || LEFT(date, 2) || '-' || SUBSTR(date, 4, 2))::DATE new_date
+FROM sf_crime_data;
