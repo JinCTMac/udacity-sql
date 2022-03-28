@@ -153,5 +153,5 @@ RIGHT(primary_poc, LENGTH(primary_poc) - POSITION(' ' IN primary_poc)) AS last_n
 FROM accounts)
 
 SELECT t1.name, t1.primary_poc,
-CONCAT(LEFT(t1.first_name, 1), RIGHT(t1.last_name, 1), LEFT(t1.last_name, 1), RIGHT(t1.last_name, 1), LENGTH(t1.first_name), LENGTH(t1.last_name), t1.name) AS password
+CONCAT(LOWER(LEFT(t1.first_name, 1)), RIGHT(t1.last_name, 1), LEFT(t1.last_name, 1), RIGHT(t1.last_name, 1), LENGTH(t1.first_name), LENGTH(t1.last_name), t1.name) AS password
 FROM t1;
