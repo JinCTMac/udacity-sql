@@ -155,3 +155,13 @@ FROM accounts)
 SELECT t1.name, t1.primary_poc,
 CONCAT(LOWER(LEFT(t1.first_name, 1)), RIGHT(t1.last_name, 1), LEFT(t1.last_name, 1), RIGHT(t1.last_name, 1), LENGTH(t1.first_name), LENGTH(t1.last_name), t1.name) AS password
 FROM t1;
+
+/* 4) CAST function */
+
+/* CAST allows us to convert one data type to another, typically a string to a date or a number - if we want to convert a number to a string, we can use SUBSTRING, LEFT, RIGHT, etc */
+
+SELECT year, month, day,
+CAST(CONCAT(year, '-', month, '-', day)) AS new_date
+FROM datebook;
+
+/* task to convert a non-conventional date format into a SQL-readable date format of yyyy-mm-dd */
