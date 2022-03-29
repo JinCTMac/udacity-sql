@@ -21,7 +21,7 @@ SELECT id, standard_amt_usd,
 SUM(standard_amt_usd) OVER (ORDER BY occurred_at) AS running_total
 FROM orders;
 
-/* task 2) now create a running total partioned by year */
+/* task 2) now create a running total partioned by year, great stack overflow post for another example of partioning https://stackoverflow.com/questions/561836/oracle-partition-by-keyword */
 
 SELECT standard_amt_usd,
 DATE_TRUNC('year', occurred_at) AS date,
