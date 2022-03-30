@@ -53,3 +53,15 @@ FROM orders;
 SELECT id, account_id, total,
 RANK() OVER (PARTITION BY account_id ORDER BY total) AS total_rank
 FROM orders;
+
+/* Window Functions 3 - Using aggregates with window functions */
+
+/* SUM just does a running total, with splits depending on if the data is partitioned by anything, such as date */
+
+/* COUNT shows a running count, with similar potential to be partitioned */
+
+/* AVG does a running average, aka the running SUM by the running COUNT */
+
+/* MIN shows the lowest value up to that point in the window, so it will likely drop until the next window partition occurs, at which point it will reset to the lowest value in the next window partition */
+
+/* MAX works the same way as MIN */
