@@ -84,7 +84,7 @@ SELECT id,
        MAX(standard_qty) OVER (PARTITION BY account_id ORDER BY DATE_TRUNC('month',occurred_at)) AS max_std_qty
 FROM orders
 
-/* Window Functions 4 */
+/* Window Functions 4 - using an alias */
 
 /* instead of writing the window function multiple times in the same query for multiple columns, you can just write a single window function and reference that in the columns */
 
@@ -95,3 +95,20 @@ SUM(standard_qty) OVER main_window AS sum_standard_qty
 COUNT(standard_qty) OVER main_window AS count_standard_qty
 FROM orders
 WINDOW main_window AS (PARTITION BY account_id ORDER BY DATE_TRUNC('month', occurred_at));
+
+/* task to do the same for a different query */
+
+SELECT id,
+       account_id,
+       DATE_TRUNC('year',occurred_at) AS year,
+       DENSE_RANK() OVER main_window AS dense_rank,
+       total_amt_usd,
+       SUM(total_amt_usd) OVER main_window AS sum_total_amt_usd,
+       COUNT(total_amt_usd) OVER main_window AS count_total_amt_usd,
+       AVG(total_amt_usd) OVER main_window AS avg_total_amt_usd,
+       MIN(total_amt_usd) OVER main_window AS min_total_amt_usd,
+       MAX(total_amt_usd) OVER main_window AS max_total_amt_usd
+FROM orders
+WINDOW main_window AS (PARTITION BY account_id ORDER BY DATE_TRUNC('year',occurred_at))
+
+/* Window Functions 5 - Comparing a row to a previous row */
