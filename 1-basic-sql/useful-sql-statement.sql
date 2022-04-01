@@ -16,3 +16,7 @@ ORDER BY week;
 
 SELECT to_date(event_timestamp) AS contact_date
 FROM table;
+
+/* DATA TYPES - show datatypes of table, creates new table showing the data types of each column in the table */
+
+SHOW CREATE TABLE lookup.calendar;
