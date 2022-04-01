@@ -11,3 +11,8 @@ CAST((SELECT COUNT(*) FROM orders WHERE total > 50) AS FLOAT)/COUNT(*) orders_ov
 FROM orders
 GROUP BY week
 ORDER BY week;
+
+/* DATES - converting datetime to date using to_date function */
+
+SELECT to_date(event_timestamp) AS contact_date
+FROM table;
