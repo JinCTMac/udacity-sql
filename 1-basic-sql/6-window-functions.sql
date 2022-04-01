@@ -112,3 +112,81 @@ FROM orders
 WINDOW main_window AS (PARTITION BY account_id ORDER BY DATE_TRUNC('year',occurred_at))
 
 /* Window Functions 5 - Comparing a row to a previous row */
+
+/* you can use LAG and LEAD to create new columns containing the values above and below a row in the table, to compare the difference in value between rows previous and after a row */
+
+/* LAG returns the value from the previous row to the current row in the table */
+
+/* 1) inner query gives accounts and the SUM of the standard qty paper they've bought over time */
+
+SELECT account_id, SUM(standard_qty) AS standard_sum
+FROM orders
+GROUP BY 1;
+
+/* 2) outer query just queries the same info from that subquery table */
+
+SELECT account_id, standard_sum
+FROM   (
+        SELECT   account_id, SUM(standard_qty) AS standard_sum
+        FROM     orders
+        GROUP BY 1
+       ) sub
+
+/* 3) we use the window function to order by the amount of standard_qty purchase, then we call the lag function to create a new column that pulls the value from the previous row, for the first row it will be NULL as there is no previous value to pull from */
+
+SELECT account_id,
+       standard_sum,
+       LAG(standard_sum) OVER (ORDER BY standard_sum) AS lag
+FROM   (
+        SELECT   account_id, SUM(standard_qty) AS standard_sum
+        FROM     orders
+        GROUP BY 1
+       ) sub
+
+/* 4) to compare values between rows, we need to create a lag_difference column that is the current row value - the lag row value */
+
+SELECT account_id,
+       standard_sum,
+       LAG(standard_sum) OVER (ORDER BY standard_sum) AS lag,
+       standard_sum - LAG(standard_sum) OVER (ORDER BY standard_sum) AS lag_difference
+FROM (
+       SELECT account_id,
+       SUM(standard_qty) AS standard_sum
+       FROM orders
+       GROUP BY 1
+      ) sub
+
+/* LEAD returns value from following row */
+
+/* parts 1 and 2 are the same as LAG, part 3) involves creating the lead function as a window function ordered by standard_sum */
+
+SELECT account_id,
+       standard_sum,
+       LEAD(standard_sum) OVER (ORDER BY standard_sum) AS lead
+FROM   (
+        SELECT   account_id,
+                 SUM(standard_qty) AS standard_sum
+        FROM     demo.orders
+        GROUP BY 1
+       ) sub
+
+/* 4) create the lead_difference column as the lead value - the current row standard_sum value */
+
+SELECT account_id,
+       standard_sum,
+       LEAD(standard_sum) OVER (ORDER BY standard_sum) AS lead,
+       LEAD(standard_sum) OVER (ORDER BY standard_sum) - standard_sum AS lead_difference
+FROM (
+SELECT account_id,
+       SUM(standard_qty) AS standard_sum
+       FROM orders
+       GROUP BY 1
+     ) sub
+
+/* USE CASES FOR LEAD AND LAG */
+
+/* You can use LAG and LEAD functions whenever you are trying to compare the values in adjacent rows or rows that are offset by a certain number.
+
+Example 1: You have a sales dataset with the following data and need to compare how the market segments fare against each other on profits earned.
+
+Example 2: You have an inventory dataset with the following data and need to compare the number of days elapsed between each subsequent order placed for Item A. */
