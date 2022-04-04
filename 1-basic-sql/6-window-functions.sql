@@ -190,3 +190,17 @@ SELECT account_id,
 Example 1: You have a sales dataset with the following data and need to compare how the market segments fare against each other on profits earned.
 
 Example 2: You have an inventory dataset with the following data and need to compare the number of days elapsed between each subsequent order placed for Item A. */
+
+/* task 1) using LEAD function to look at sales of next order and determine the difference in revenue between order and next order based on date, ordered by occurred_at */
+
+SELECT occurred_at,
+       total_amt,
+       LEAD(total_amt) OVER (ORDER BY occurred_at) AS lead,
+       LEAD(total_amt) OVER (ORDER BY occurred_at) - total_amt AS lead_difference
+FROM (
+SELECT occurred_at,
+       SUM(total_amt_usd) AS total_amt
+  FROM orders
+ GROUP BY 1
+ ) sub
+ ORDER BY occurred_at;
