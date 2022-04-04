@@ -215,3 +215,11 @@ SELECT id, occurred_at, standard_qty,
   NTILE(100) OVER (ORDER BY standard_qty) AS percentile
 FROM orders
 ORDER BY standard_qty DESC;
+
+/* q1) use NTILE to divide accounts into their order, split by quantile baesd on the standard_qty */
+
+SELECT account_id, occurred_at, SUM(standard_qty) total_qty,
+NTILE(4) OVER (ORDER BY SUM(standard_qty)) AS quartile
+FROM orders
+GROUP BY account_id, occurred_at
+ORDER BY total_qty DESC;
