@@ -204,3 +204,14 @@ SELECT occurred_at,
  GROUP BY 1
  ) sub
  ORDER BY occurred_at;
+
+/* Window Functions 6 - using percentiles to see where most data falls i.e. distribution */
+
+/* We can use the NTILE function to determine which percentile the row falls into with a piece of data, so if we use standard_qty as the data, we can use NTILE to split the data into percentiles, quartiles, quintiles, etc baesd on the size of the data value, where the largest goes into the largest quartile/quintile/percentile, and the smallest goes in the 1st quartile/quintile/percentile */
+
+SELECT id, occurred_at, standard_qty,
+  NTILE(4) OVER (ORDER BY standard_qty) AS quartile,
+  NTILE(5) OVER (ORDER BY standard_qty) AS quintile,
+  NTILE(100) OVER (ORDER BY standard_qty) AS percentile
+FROM orders
+ORDER BY standard_qty DESC;
