@@ -50,3 +50,5 @@ FROM accounts a
 FULL OUTER JOIN sales_reps s
 ON a.sales_rep_id = s.id
 WHERE a.sales_rep_id IS NULL OR s.id IS NULL;
+
+/* 2) JOINS with comparison operators */
