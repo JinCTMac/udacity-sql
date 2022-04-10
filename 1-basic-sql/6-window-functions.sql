@@ -2,6 +2,8 @@
 
 /* Window functions allow you to compare one row to another without any joins, allowing you to do things like create a running total and comparing rows against another to see if one row is larger than the other, or doing an aggregation and partioning results across select data like a GROUP BY, see https://www.postgresql.org/docs/9.1/tutorial-window.html, another resource https://blog.sqlauthority.com/2015/11/04/sql-server-what-is-the-over-clause-notes-from-the-field-101/, another resource with an image showing how window functions differ from aggregate functions https://www.sqltutorial.org/sql-window-functions/ */
 
+/* another great resource for understanding how window functions work https://towardsdatascience.com/a-guide-to-advanced-sql-window-functions-f63f2642cbf9*/
+
 /* ex1) the window function below could be described as calcuating the sum of the standard_qty up to a certain point, ordering by date occurred_at, which uses the OVER keyword to indicate it is a window function */
 
 SELECT standard_qty,
