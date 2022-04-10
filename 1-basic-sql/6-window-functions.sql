@@ -218,10 +218,56 @@ SELECT id, occurred_at, standard_qty,
 FROM orders
 ORDER BY standard_qty DESC;
 
-/* q1) use NTILE to divide accounts into their order, split by quantile baesd on the standard_qty */
+/* q1) use NTILE to divide accounts into their order, split by quantile (four levels) based on the standard_qty */
 
 SELECT account_id, occurred_at, SUM(standard_qty) total_qty,
 NTILE(4) OVER (ORDER BY SUM(standard_qty)) AS quartile
 FROM orders
 GROUP BY account_id, occurred_at
 ORDER BY total_qty DESC;
+
+/* EX))))) Misunderstood question, I used NTILE to look at quantiles for the entire dataset of orders, and grouped by account_id and occurred_at to look at the quantile for individual orders, while the question wanted me to look at quantiles for each account's orders as a partition instead, so each account is split into quartiles to understand their order quantities better */
+
+SELECT account_id, occurred_at, SUM(gloss_qty) total_gloss_qty,
+NTILE(4) OVER (ORDER BY SUM(gloss_qty)) AS gloss_half
+FROM orders
+GROUP BY account_id, occurred_at
+ORDER BY total_gloss_qty DESC;
+
+/* actual solution, we want to actually partition by account ID to split only the accounts' orders into halves, so the highest amount a customer has ordered will fall in their respective top half, and the smallest will into their lower half */
+
+SELECT
+       account_id,
+       occurred_at,
+       standard_qty,
+       NTILE(4) OVER (PARTITION BY account_id ORDER BY standard_qty) AS standard_quartile
+FROM orders
+ORDER BY account_id DESC;
+
+/* q2) use NTILE to divide the accounts orders into two levels based on the amount of gloss_qty in their orders */
+
+SELECT
+       account_id,
+       occurred_at,
+       gloss_qty,
+       NTILE(2) OVER (PARTITION BY account_id ORDER BY gloss_qty) AS gloss_half
+FROM orders
+ORDER BY gloss_qty DESC;
+
+/* q3) use NTILE to divide the accounts orders into percentiles (100 levels) based on the amount of total_amt_usd - just writing out thought process, we need to sum up the total_amt_usd for each account, grouping by account_id to ensure the total_amt_usd for each order is aggregated for each account, then build the NTILEs */
+
+SELECT account_id, occurred_at, SUM(total_amt_usd) total_amt_spent,
+NTILE(100) OVER (ORDER BY SUM(total_amt_usd)) AS percentile
+FROM orders
+GROUP BY account_id, occurred_at
+ORDER BY total_amt_spent DESC;
+
+/* CORRECT ANSWER FOR Q3 */
+
+SELECT
+       account_id,
+       occurred_at,
+       total_amt_usd,
+       NTILE(100) OVER (PARTITION BY account_id ORDER BY total_amt_usd) AS total_percentile
+FROM orders
+ORDER BY account_id DESC;
