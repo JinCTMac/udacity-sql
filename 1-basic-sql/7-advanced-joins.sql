@@ -52,3 +52,35 @@ ON a.sales_rep_id = s.id
 WHERE a.sales_rep_id IS NULL OR s.id IS NULL;
 
 /* 2) JOINS with comparison operators */
+
+/* We can use comparison operators like <, >, <= and >= in our joins as additional clauses to add more selection criteria for the join, such as only getting orders before a certain date, or in the case of the example, getting whether there are web events that took place prior to an accounts first order */
+
+SELECT o.id,
+       o.occurred_at,
+       e.*
+FROM orders o
+LEFT JOIN web_events e
+ON o.account_id = e.acconut_id
+AND e.occurred_at < o.occurred_at
+WHERE DATE_TRUNC('month', o.occurred_at) = (SELECT DATE_TRUNC('month', MIN(o.occurred_at) FROM orders)
+ORDER BY o.account_id, o.occurred_at;
+
+/* Inequality operators (a.k.a. comparison operators) don't only need to be date times or numbers, they also work on strings! You'll see how this works by completing the following quiz, which will also reinforce the concept of joining with comparison operators. */
+
+/* ex) in the example below, we are joining accounts and sales reps, and using comparison operators in the join to isolate accounts where the name of the primary_poc comes before the name of the sales rep alphabetically, which is indicated by the < operator, also see https://stackoverflow.com/questions/26080187/sql-string-comparison-greater-than-and-less-than-operators/26080240#26080240 */
+
+SELECT a.name account, a.primary_poc, s.name sales_rep
+FROM accounts a
+JOIN sales_reps s
+ON a.sales_rep_id = s.id
+AND a.primary_poc < s.name;
+
+/* the exemplar query using a left join instead of an inner join */
+
+SELECT accounts.name as account_name,
+       accounts.primary_poc as poc_name,
+       sales_reps.name as sales_rep_name
+FROM accounts
+LEFT JOIN sales_reps
+ON accounts.sales_rep_id = sales_reps.id
+AND accounts.primary_poc < sales_reps.name;
