@@ -10,7 +10,7 @@ SELECT standard_qty,
 SUM(standard_qty) OVER (ORDER BY occurred_at) AS running_total
 FROM orders;
 
-/* ex2) we can also make a window function calculate the running total up to the end of each month, using the PARTITION BY keywords to indicate that the results will be split for each month, where the running total resets back to 0 once a new month begins */
+/* ex2) we can also make a window function calculate the running total up to the end of each month, using the PARTITION BY keyword to indicate that the results will be split for each month, where the running total resets back to 0 once a new month begins */
 
 SELECT standard_qty,
 DATE_TRUNC('month', occurred_at) AS date,
