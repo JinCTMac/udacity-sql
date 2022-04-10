@@ -123,4 +123,33 @@ ORDER BY w1.account_id, w2.occurred_at;
 
 /* 4) UNION operator */
 
-/* The UNION operator is used to combine the results of
+/* The UNION operator is used to combine the results of two or more SELECT statements, removing any duplicate rows between the results of those queries. Each SELECT statement must have the same number of fields/columns with similar data types, and is typically used when you want to pull distinct values of select columns across multiple tables, such as the ingredients for different meals, or the results of different queries on the same table, or append an aggregation like a sum to the end of a list of data. UNION ALL does the same thing, except it doesn't remove duplciate rows. */
+
+SELECT *
+FROM orders1
+UNION
+SELECT *
+FROM orders2;
+
+/* You can pretreat the tables before a union, such as using a WHERE condition to select only specific data in the first table, and another WHERE clause and a different condition in the second table */
+
+SELECT *
+FROM web_events
+WHERE channel = 'Facebook'
+UNION
+SELECT *
+FROM web_events
+WHERE channel = 'direct';
+
+/* you can then perform queries on the union table instead of the individual tables by making the results of the union into a subquery, or using it with the WITH keyword */
+
+SELECT channel, COUNT(*) AS sessions
+FROM (SELECT *
+  FROM web_events
+  WHERE channel = 'Facebook'
+  UNION
+  SELECT *
+  FROM web_events
+  WHERE channel = 'direct')
+GROUP BY channel
+ORDER BY sessions;
