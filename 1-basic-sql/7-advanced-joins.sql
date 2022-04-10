@@ -84,3 +84,43 @@ FROM accounts
 LEFT JOIN sales_reps
 ON accounts.sales_rep_id = sales_reps.id
 AND accounts.primary_poc < sales_reps.name;
+
+/* 3) Self JOINs */
+
+/* Self JOINs are used in very rare situations, but can be useful if you want to know when events happened one after another, such as in the example case where you want to know which accounts placed multiple orders within 30 days */
+
+/* ex) in this example below, we want to find out which accounts had multiple orders placed within 30 days of an order (any order), to see which accounts are likely to place multiple orders. To do so, we need to perform a self JOIN, using aliases to separate the two instances of the same table, and joining using two comparison operator conditions. The first is to join only rows in o2 where the occurred_at is greater than the occurred_at in o1, so only selecting orders after the original order in o1, and then the second is to specify that orders in o2 occurred within a 28 day interval of the original order placed in o1. */
+
+SELECT o1.id AS o1.id,
+       o1.account_id AS o1.acconut_id,
+       o1.occurred_at AS o1.occurred_at,
+       o2.id AS o2.id,
+       o2.account_id AS o2.account_id,
+       o2.occurred_at AS o2.occurred_at,
+FROM orders o1
+LEFT JOIN orders o2
+ON o1.account_id = o2.account_id
+AND o2.occurred_at > o1.occurred_at
+AND o2.occurred_at <= o1.occurred_at + INTERVAL '28 days'
+ORDER BY o1.account_id, o1.occurred_at;
+
+/* ex) doing the same thing but for web events, web events that occurred one day or less than after the original event */
+
+SELECT w1.id AS w_id,
+       w1.account_id AS w1_account_id,
+       w1.occurred_at AS w1_occurred_at,
+       w1.channel AS w1_channel,
+       w2.id AS w2_id,
+       w2.account_id AS w2_account_id,
+       w2.occurred_at AS w2_occurred_at,
+       w2.channel AS w2_channel
+FROM web_events w1
+LEFT JOIN web_events w2
+ON w1.account_id = w2.account_id
+AND w1.occurred_at > w2.occurred_at
+AND w1.occurred_at <= w2.occurred_at + INTERVAL '1 day'
+ORDER BY w1.account_id, w2.occurred_at;
+
+/* 4) UNION operator */
+
+/* The UNION operator is used to combine the results of
