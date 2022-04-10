@@ -36,4 +36,17 @@ WHERE Table_A.column_name IS NULL OR Table_B.column_name IS NULL;
 
 - but also each account that does not have a sales rep and each sales rep that does not have an account (some of the columns in these returned rows will be empty)
 
-Here a full outer join is very useful */
+Here a full outer join is very useful (also see https://stackoverflow.com/questions/2094793/when-is-a-good-situation-to-use-a-full-outer-join)*/
+
+SELECT a.*, s.*
+FROM accounts a
+FULL OUTER JOIN sales_reps s
+ON a.sales_rep_id = s.id;
+
+/* We can go one step further and use WHERE and IS NULL to check if either of the matching conditions has NULL data in them - in this case, there are none so each sales_rep has an account and each account has a sales_rep */
+
+SELECT a.*, s.*
+FROM accounts a
+FULL OUTER JOIN sales_reps s
+ON a.sales_rep_id = s.id
+WHERE a.sales_rep_id IS NULL OR s.id IS NULL;
