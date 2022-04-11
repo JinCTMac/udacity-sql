@@ -191,3 +191,76 @@ SELECT name,
 FROM double_accounts
 GROUP BY 1
 ORDER BY 2 DESC;
+
+/* 5) Performance Tunin with SQL */
+
+/* SQL allows you to work with massive datasets, but there are ways to improve the performance of your queries so that even with massive datasets, the runtime of the queries isn't too bad, just like improving time complexity in regular programming functions */
+
+/* To make a query run faster, we want to reduce the number of operations being performed. This includes:
+
+- reducing table size
+- reducing joins
+- reducing aggregations - in particular, COUNT DISTINCT takes much longer than COUNT because each row must be checked against all other rows to ensure distinct data
+
+Sometimes, there are things you can't control affecting performance. For example, on a cloud database there may be many other users running queries at the same time as you, whereas sometimes different databases are optimised for performance differently, i.e. Redshift is optimised for query speed.
+
+Making queries more efficient involves usually a combination of these things. */
+
+/* ex1) Limiting the data being queried can dramatically reduce query runtime, as there's less data to look at and process, such as with time-series data where limiting to a small date window will help. For exploration, a limited result set is fine, then you can undo those for the final query. */
+
+SELECT *
+FROM orders
+WHERE occurred_at BETWEEN '2022-03-01' AND '2022-03-31';
+
+/* you can put limits in subqueries to speed up runtime, but note this often messes up the data you're working with, so only do it to test query logic, not actually run the final query */
+
+SELECT account_id, SUM(poster_qty) AS poster_sum
+FROM (SELECT * FROM orders LIMIT 100)
+WHERE occurred_at BETWEEN '2022-03-01' AND '2022-03-31'
+GROUP BY account_id;
+
+/* ex2) reducing the sizes of tables before you join can reduce runtime. For example, pre-aggregating a table's results before joining reduces the number of rows in the table prior to joining and hence speeds up the query. In the example below, there are around 9000 rows in the web_events table, and 351 rows in the accounts table, but if we pre-aggregate the web_events table by account, then join, it is much faster than joining then aggregating. */
+
+SELECT a.name, sub.web_events
+FROM (SELECT account_id, COUNT(*) AS web_events_count
+  FROM web_events) sub
+JOIN accounts a
+ON sub.account_id = a.id
+ORDER BY sub.web_events DESC;
+
+/* ex3) using EXPLAIN to get a sense of query operation */
+
+/* You can use EXPLAIN before a query to show you the steps the query takes in its runtime, then see the cost or time associated with the query */
+
+EXPLAIN
+SELECT *
+FROM orders
+WHERE occurred_at BETWEEN '2022-04-09' AND '2022-04-11'
+LIMIT 100;
+
+/* ex4) Joining subqueries to boost performance */
+
+/* Imagine that you needed to build multiple metrics for a dashboard that would help the day-to-day running of a business. You could do this through one big query, but there are many performance advantages to building many pre-aggregated subqueries and joining them to get the same result. */
+
+/* The below starting query before aggregation returns nearly 79000 rows, which is a lot of data. */
+
+SELECT o.occurred_at AS date,
+       a.sales_rep_id,
+       o.id AS order_id,
+       we.id AS web_event_id
+FROM   accounts a
+JOIN   orders o
+ON     o.account_id = a.id
+JOIN   web_events we
+ON     DATE_TRUNC('day', we.occurred_at) = DATE_TRUNC('day', o.occurred_at)
+ORDER BY 1 DESC;
+
+/* Instead of aggregating this huge dataset after this query, it's much easier to aggregate the individual tables separately, as you're counting across a much smaller number of rows per table. This forms the first sub query, which returns the days, the number of sales reps and the number of orders on that day. */
+
+SELECT DATE_TRUNC('day', o.occurred_at) AS date,
+COUNT(a.sales_rep_id) AS active_sales_rep,
+COUNT(o.id) AS orders
+FROM accounts a
+JOIN orders o
+ON o.account_id = a.id
+GROUP BY date;
