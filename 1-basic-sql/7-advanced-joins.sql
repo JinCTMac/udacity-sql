@@ -240,7 +240,7 @@ LIMIT 100;
 
 /* ex4) Joining subqueries to boost performance */
 
-/* Imagine that you needed to build multiple metrics for a dashboard that would help the day-to-day running of a business. You could do this through one big query, but there are many performance advantages to building many pre-aggregated subqueries and joining them to get the same result. */
+/* Imagine that you needed to build multiple metrics for a dashboard that would help the day-to-day running of a business. You could do this through one big query, but there are many performance advantages to building many pre-aggregated subqueries and joining them to get the same result. We will be joining accounts, orders and web events and aggregate all this data together to form our dashboard metrics. */
 
 /* The below starting query before aggregation returns nearly 79000 rows, which is a lot of data. */
 
@@ -255,12 +255,43 @@ JOIN   web_events we
 ON     DATE_TRUNC('day', we.occurred_at) = DATE_TRUNC('day', o.occurred_at)
 ORDER BY 1 DESC;
 
-/* Instead of aggregating this huge dataset after this query, it's much easier to aggregate the individual tables separately, as you're counting across a much smaller number of rows per table. This forms the first sub query, which returns the days, the number of sales reps and the number of orders on that day. */
+/* Instead of aggregating this huge dataset after this query, it's much easier to aggregate the individual tables separately, as you're counting across a much smaller number of rows per table. This forms the first sub query, which returns the days, the number of sales reps and the number of orders on that day, and only about a 1000 rows worth of data as opposed to 79000. */
 
 SELECT DATE_TRUNC('day', o.occurred_at) AS date,
-COUNT(a.sales_rep_id) AS active_sales_rep,
+COUNT(a.sales_rep_id) AS active_sales_reps,
 COUNT(o.id) AS orders
 FROM accounts a
 JOIN orders o
 ON o.account_id = a.id
 GROUP BY date;
+
+/* Then, we can write a second subquery that will do the same but for the web events. This returns around another 1000 rows, which is much easier to join onto, and is separated out by day just like the previous subquery. */
+
+SELECT DATE_TRUNC('day', o.occurred_at) AS date,
+COUNT(w.id) AS web_visits
+FROM web_events w
+GROUP BY date;
+
+/* The full final query involves us joining these two subquery tables, using a full join to ensure we account for all of the records. */
+
+SELECT COALESCE(orders.date, web_events.date) AS date,
+orders.active_sales_reps,
+orders.orders,
+web_events.web_visits
+FROM (SELECT DATE_TRUNC('day', o.occurred_at) AS date,
+  COUNT(a.sales_rep_id) AS active_sales_reps,
+  COUNT(o.id) AS orders
+  FROM accounts a
+  JOIN orders o
+  ON o.account_id = a.id
+  GROUP BY date) orders
+
+FULL JOIN
+
+(SELECT DATE_TRUNC('day', o.occurred_at) AS date,
+COUNT(w.id) AS web_visits
+FROM web_events w
+GROUP BY date) web_events
+
+ON orders.date = web_events.date
+ORDER BY date DESC;

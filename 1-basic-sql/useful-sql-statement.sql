@@ -20,3 +20,27 @@ FROM table;
 /* DATA TYPES - show datatypes of table, creates new table showing the data types of each column in the table */
 
 SHOW CREATE TABLE lookup.calendar;
+
+/* advanced SQL query joining subqueries to reduce row counts and improve runtime speed */
+
+SELECT COALESCE(orders.date, web_events.date) AS date,
+orders.active_sales_reps,
+orders.orders,
+web_events.web_visits
+FROM (SELECT DATE_TRUNC('day', o.occurred_at) AS date,
+  COUNT(a.sales_rep_id) AS active_sales_reps,
+  COUNT(o.id) AS orders
+  FROM accounts a
+  JOIN orders o
+  ON o.account_id = a.id
+  GROUP BY date) orders
+
+FULL JOIN
+
+(SELECT DATE_TRUNC('day', o.occurred_at) AS date,
+COUNT(w.id) AS web_visits
+FROM web_events w
+GROUP BY date) web_events
+
+ON orders.date = web_events.date
+ORDER BY date DESC;
