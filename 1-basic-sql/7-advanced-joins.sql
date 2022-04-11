@@ -153,3 +153,41 @@ FROM (SELECT *
   WHERE channel = 'direct')
 GROUP BY channel
 ORDER BY sessions;
+
+/* UNION ALL on two instances of the same table returns twice the results of the table on its own */
+
+SELECT *
+FROM accounts a1
+UNION ALL
+SELECT *
+FROM accounts a2;
+
+/* pretreating tables example to extract Walmart and Disney */
+
+SELECT *
+FROM accounts a1
+WHERE name = 'Walmart'
+UNION
+SELECT *
+FROM accounts a2
+WHERE name = 'Disney';
+
+/* Performing operations on a combined dataset */
+
+/* Perform the union in your first query (under the Appending Data via UNION header) in a common table expression and name it double_accounts. Then do a COUNT the number of times a name appears in the double_accounts table. If you do this correctly, your query results should have a count of 2 for each name, since you just stacked two copies of the same table on top of each other with UNION ALL, like below */
+
+WITH double_accounts AS (
+    SELECT *
+      FROM accounts
+
+    UNION ALL
+
+    SELECT *
+      FROM accounts
+)
+
+SELECT name,
+       COUNT(*) AS name_count
+FROM double_accounts
+GROUP BY 1
+ORDER BY 2 DESC;
