@@ -1,0 +1,43 @@
+Arrays and Structs in SQL
+
+What are arrays and structs?
+- Arrays and structs are data types in SQL.
+- They have a big performance advantage over normalised data, where data is stored in multiple tables to reduce storage costs, and un-normalised data where certain columns are repeated to improve query performance by reducing the need for additional tables to hold data.
+- Arrays and structs use rows where data can be nested inside array and JSON/object-like structures, allowing us to store multiple pieces of information in a single row instead of multiple rows. This allows us to experience the performance benefits of un-normalised database data and reduce data redundancy like in normalised data.
+
+What do arrays and structs look like in SQL?
+- Arrays in SQL/Google Bigquery look just like arrays in other languages, so data enclosed inside of [] brackets - however, unlike some other languages, the data inside of an array MUST be of the same data type:
+  - address_history:["current", "previous", "birth"]
+- An array has nested values, so if you look at a data field that has the mode "REPEATED" in it, then it is an array.
+
+- Structs are data types that store data in key-value pairs, just like JS objects and dictionaries in Python
+  - address_history: {
+    "status": "current",
+    "address": "London",
+    "postcode": "ABC123D"
+  }
+- Structs differ from arrays in that they have many key-value pairs, and thus when we want to access data inside of a struct, we need to use dot notation to access that data i.e. address_history.address, alongside usually having the data type of "RECORD" to indicate the presence of a struct.
+
+- You can also have an array of structs, allowing us to store multiple rows of information.
+- address_history: [
+    { “status”:”current”, “address”:”London”, “postcode”:”ABC123D” },
+    { “status”:”previous”, “address”:”New Delhi”, “postcode”:”738497" },
+    { “status”:”birth”, “address”:”New York”, “postcode”:”SHI747H” }
+  ]
+
+- You can create an array table like so:
+
+
+# Create a simple array with square brackets
+#standardSQL
+CREATE OR REPLACE TABLE `array-and-struct.array.restaurant_cuisine` AS (
+SELECT "Cafe Paci" AS name, "Newtown" AS location, ["European", "Casual", "Wine bar"] AS cuisine_array
+UNION ALL
+SELECT "Ho Jiak" AS name, "Haymarket" AS location, ["Malaysian", "Street-food"] AS cuisine_array
+UNION ALL
+SELECT "Spice I Am" AS name, "Surry Hills" AS location, ["Thai", "Casual"] AS cuisine_array
+UNION ALL
+SELECT "Chaco Bar" AS name, "Potts Point" AS location, ["Japanese", "Yakitori", "Casual"] AS cuisine_array);
+
+
+How to query arrays/structs/an array of structs?
