@@ -1,4 +1,6 @@
 Arrays and Structs in SQL
+(see https://medium.com/google-cloud/how-to-work-with-array-and-structs-in-bigquery-9c0a2ea584a6)
+(and https://towardsdatascience.com/explore-arrays-and-structs-for-better-performance-in-google-bigquery-8978fb00a5bc#:~:text=An%20array%20is%20a%20data,records%20are%20arrays%20of%20structs)
 
 What are arrays and structs?
 - Arrays and structs are data types in SQL.
@@ -41,3 +43,56 @@ SELECT "Chaco Bar" AS name, "Potts Point" AS location, ["Japanese", "Yakitori", 
 
 
 How to query arrays/structs/an array of structs?
+
+Arrays:
+  - To query arrays, we can just select that column from a table using a simple SELECT statement. However, this will return the array as a group, essentially only returning one row of data. If we want to see all the elements in the array ungrouped, we need to use the UNNEST keyword.
+
+  SELECT addr
+  FROM array_test
+  UNNEST [address_history] AS addr;
+
+  SELECT name, location, cuisine
+  FROM `array-and-struct.array.restaurant_cuisine`, UNNEST(cuisine_array) AS cuisine;
+
+Structs:
+  - Structs do not need unnesting, and will return all of the key value pairs inside of a struct as a signle row. However, if you want to access singular values inside of the struct, you can use dot notation as you would with objects/dictionaries in other languages, i.e. address_history.status
+
+Array of structs:
+  - If we query an array of structs column, it will return a singular row, containing each of the key-value pairs for each struct in the array. If you want to select certain keys from the array of structs, you again need to UNNEST that array.
+
+  SELECT addr
+  FROM array_test
+  UNNEST [address_history] AS addr;
+
+  You can also select just a few columns from the structs instead of the whole structs using dot notation.
+
+  SELECT addr.status, addr.address
+  FROM array_test
+  UNNEST [address_history] AS addr;
+
+Creating arrays, structs and array of structs:
+
+-- Create Array (REPEATED)
+create table testing.array_demo as
+with a as (
+select ["current", "previous", "birth"] as address_history
+)
+select address_history from a;
+
+
+-- Create Struct (RECORD)
+create table testing.struct_demo as
+with a as (
+select struct("current" as status,"London" as address, "ABC123D" as postcode) as address_history
+)
+select address_history from a;
+
+
+-- Create Array of Struct (RECORD REPEATED)
+create table testing.array_of_struct_demo as
+with a as (
+select [struct("current" as status,"London" as address, "ABC123D" as postcode),
+        struct("previous" as status,"New Delhi" as address, "738497" as postcode),
+        struct("birth" as status,"New York" as address, "SHI747H" as postcode)]as address_history
+)
+select address_history from a;
